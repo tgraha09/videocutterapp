@@ -4,7 +4,7 @@ import { formatDuration, getVideoIdFromUrl, fetchVideoTitle } from '@/app/utils/
 import React, { useRef, useEffect, useState } from 'react';
 import YouTubePlayer from 'youtube-player';
 
-const PlayerComponent = ({ finishedPush, pushed, shift, canShift,previewing, handlePreview, videoUrl, 
+const PlayerComponent = ({ durationDifference, durationHandler, finishedPush, pushed, shift, canShift,previewing, handlePreview, videoUrl, 
   id, markData, checkMark, previewDuration}) => {
   const playerRef = useRef(null);
   const [totalDuration, setTotalDuration] = useState(-1);
@@ -77,6 +77,7 @@ const PlayerComponent = ({ finishedPush, pushed, shift, canShift,previewing, han
     setInterval(() => {
       playerRef.current.getCurrentTime().then((currentTime) => {
         setCurrentDuration(currentTime);
+        durationHandler({id, duration: currentTime});
       });
     }, 100);
     if (state === 1) { // PlayerState.PLAYING
@@ -173,8 +174,15 @@ const PlayerComponent = ({ finishedPush, pushed, shift, canShift,previewing, han
       setMark(currentDuration);
       //console.log({id, mark: currentDuration});
       markData({id, mark: currentDuration});
-  };
 
+      
+  };
+  const formatTotalDuration = ()=>{if (id === "start") {
+    return formatDuration(durationDifference - currentDuration);
+    } else if (id === "end") {
+      return formatDuration(currentDuration - durationDifference);
+    }
+  }
 
   return <div className="player-column">
   <div  id={id}></div>
@@ -182,7 +190,9 @@ const PlayerComponent = ({ finishedPush, pushed, shift, canShift,previewing, han
 
   <div className="duration-column">
     <h3 id='duration'>{`${id.toUpperCase()}: ${formatDuration(currentDuration)}`}</h3>
+    <h3 id='duration'>{`Total Duration: ${formatTotalDuration()}`}</h3>
     <h3 id='duration'>{`Mark: ${formatDuration(mark)}`}</h3>
+    
   </div>
   <button id='mark' onClick={handleMark}>Mark {id}</button>
   

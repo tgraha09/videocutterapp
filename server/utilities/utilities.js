@@ -12,10 +12,12 @@ const createClip = async (videoUrl ,clips) => {
     const videoInfo = await youtubedl(videoUrl, { dumpSingleJson: true })
     const videoId = videoInfo.id;
     const videoTitle = shortenString(videoInfo.title);
-    const downloadsDir = path.join(projectRoot+ '/downloads', videoId);
-    const videosDir = path.join(projectRoot+ '/videos', videoId);
-    const doneDir = path.join(projectRoot+ '/done', videoId);
+    const dataDir = path.join(projectRoot , '/data');
+    const downloadsDir = path.join(dataDir+ '/downloads', videoId);
+    const videosDir = path.join(dataDir+ '/videos', videoId);
+    const doneDir = path.join(dataDir, 'done');
     const verifyDirectories = Promise.all([
+        fsExtra.ensureDir(dataDir),
         fsExtra.ensureDir(downloadsDir),
         fsExtra.ensureDir(videosDir),
         fsExtra.ensureDir(doneDir),
@@ -29,7 +31,6 @@ const createClip = async (videoUrl ,clips) => {
               console.error(`Error reading the 'downloads' subfolder: ${err}`);
               return;
             }
-          
             if (files.length === 0) {
                 console.log('No files found in the \'downloads\' subfolder.');
                 
@@ -43,7 +44,12 @@ const createClip = async (videoUrl ,clips) => {
                     cutVideo(downloadsDir, videosDir, clips, videoTitle, videoId).then(()=>{
                       
                     }).finally(()=>{
-                        mergeVideos(videosDir, path.join(doneDir, `${videoTitle}_${videoId}_${new Date().getTime()}_done.mp4`));
+                        mergeVideos(videosDir, path.join(doneDir, `${videoTitle}_${videoId}_${new Date().getTime()}_done.mp4`)).then(()=>{
+                    
+                        }).finally(()=>{
+                            deleteVideosInFolder(videosDir);
+                           // deleteVideosInFolder(downloadsDir);
+                        })
                     })
                     //cutVideo(downloadsDir, videosDir, clips, videoTitle, videoId)
                 })
@@ -52,7 +58,12 @@ const createClip = async (videoUrl ,clips) => {
               cutVideo(downloadsDir, videosDir, clips, videoTitle, videoId).then(()=>{
                       
               }).finally(()=>{
-                  mergeVideos(videosDir, path.join(doneDir, `${videoTitle}_${videoId}_${new Date().getTime()}_done.mp4`));
+                  mergeVideos(videosDir, path.join(doneDir, `${videoTitle}_${videoId}_${new Date().getTime()}_done.mp4`)).then(()=>{
+                    
+                  }).finally(()=>{
+                      deleteVideosInFolder(videosDir);
+                     // deleteVideosInFolder(downloadsDir);
+                  })
               })
             }
         });
@@ -63,12 +74,21 @@ const createClip = async (videoUrl ,clips) => {
     
 }
 
+const  deleteVideosInFolder =(folderPath)=> {
+  //const subdirectoryPath = folderPath;
+  fs.rm(folderPath, { recursive: true }, (err) => {
+    if (err) {
+      console.error('Error deleting subdirectory:', err);
+    } else {
+      console.log('Deleted subdirectory:', folderPath);
+    }
+  });
+}
+
 const downloadVideo = async (videoUrl, videoTitle, downloadsDir, videoId) => {
-    console.log("downloadVideo: " + videoUrl);
-    
+    console.log("downloadVideo: " + videoUrl); 
     const outputFilename = `${videoTitle}_${videoId}.mp4`;
     const outputFilePath = path.join(downloadsDir, outputFilename);
-    
     return await new Promise((resolve, reject) => {
         youtubedl(videoUrl, { o: outputFilePath, format: 'mp4' })
           .then(() => {
@@ -79,21 +99,21 @@ const downloadVideo = async (videoUrl, videoTitle, downloadsDir, videoId) => {
             console.error(`Error downloading video: ${err}`);
             reject(err);
           });
-      });
-
-        
-    
+    });
 
   }
 
 const cutVideo = async (downloadsDir, videosDir, clips, videoTitle, videoId) => {
+
     try {
+      console.log('Clips Length: ', clips.length);
       for (const clip of clips) {
         const startSeconds = clip.start;
         const endSeconds = clip.end;
         //videoTitle = vidTitle;
         const outputFilename = `${videoTitle}_${videoId}.mp4`;
         const outputFilePath = path.join(downloadsDir, outputFilename);
+        console.log('Output file path:', outputFilePath);
         await new Promise((resolve, reject) => {
           ffmpeg()
             .input(outputFilePath)
@@ -117,6 +137,8 @@ const cutVideo = async (downloadsDir, videosDir, clips, videoTitle, videoId) => 
       }
     } catch (error) {
       console.error('Download failed:', error.message);
+
+      
     }
   };
 
@@ -143,98 +165,6 @@ const cutVideo = async (downloadsDir, videosDir, clips, videoTitle, videoId) => 
     fs.unlinkSync(fileListPath);
   }
 
-
-
-
-
-
-  
-
-
-
-
-
-
-const downloadClip = async(videoUrl, downloadsDir, videosDir, clip, vidTitle)=>{
-    const videoInfo = await youtubedl(videoUrl, { dumpSingleJson: true });
-      videoTitle = vidTitle;
-  
-      const startSeconds = clip.startDuration.totalSeconds;
-      const endSeconds = clip.endDuration.totalSeconds;
-  
-      const outputFilename = `${videoTitle}.mp4`;
-      const outputFilePath = path.join(downloadsDir, outputFilename);
-  
-      // Download video using youtube-dl
-      console.log(`Downloading video to: ${outputFilePath}`);
-      await youtubedl(videoUrl, { o: outputFilePath, format: 'mp4' });
-}
-
-
-
-const createClips = async (videoUrl, clips, videoTitle) => {
-    console.log(videoUrl);
-    if (!videoUrl) {
-        throw new Error('No video URL specified');
-    }
-    console.log("createClips", videoUrl);
-    const isYouTubeVideo = videoUrl.includes('youtube.com/watch?v=');
-    if (isYouTubeVideo) {
-        // Download the YouTube video using ytdl-core
-       
-        const videoId = getVideoIdFromUrl(videoUrl);
-        const videoPath = path.join(downloadsDir, `${videoId}.mp4`);
-        const videoInfo = await ytdl.getInfo(videoId);
-        const videoTitle = shortenString(videoTitle);
-        const videoLength = videoInfo.videoDetails.lengthSeconds;
-        const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-        console.log(videoTitle, videoLength, videoUrl);
-        
-        const createdClips = [];
-    
-        const ffmpegInstance = ffmpeg();
-        
-        for (const clip of clips) {
-        const { start, end } = clip;
-    
-        const clipPath = `clip_${start}_${end}.mp4`;
-    
-        ffmpegInstance.inputOptions([
-            '-map', '0:v:0',
-            '-map', '0:a:0',
-            '-ss', `${start}`,
-            '-t', `${end - start}`,
-            '-c', 'copy'
-        ]);
-        
-        ffmpegInstance.input(videoUrl);
-    
-        ffmpegInstance.output(clipPath);
-    
-        createdClips.push(clipPath);
-        }
-    
-        const outputFilePath = 'combined.mp4';
-    
-        ffmpegInstance.outputOptions([
-        '-c copy',
-        '-map 0:v:0',
-        '-map 0:a:0',
-        ]);
-    
-        ffmpegInstance.output(outputFilePath);
-    
-        await new Promise((resolve, reject) => {
-        ffmpegInstance
-            .on('end', resolve)
-            .on('error', reject)
-            .run();
-        });
-    
-        return [outputFilePath, ...createdClips];
-    }
-};
-
   
 
   const shortenString = (inputString)=> {
@@ -245,14 +175,5 @@ const createClips = async (videoUrl, clips, videoTitle) => {
       return inputString.slice(0, 8); // Abbreviate to the first 8 characters
     }
   }
-
-  const getVideoIdFromUrl = (url) => {
-    const regex = /(?:\?v=|\/embed\/|\/v\/|\.be\/)([^&?#]+)/;
-    const match = url.match(regex);
-    if (match && match[1]) {
-      return match[1];
-    }
-    return null;
-  };
 
   module.exports = { createClip };

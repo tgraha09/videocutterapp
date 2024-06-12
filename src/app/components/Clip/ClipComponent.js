@@ -1,8 +1,9 @@
 import { formatDuration } from '@/app/utils/utils';
 import React, { useState, useEffect } from 'react';
 import styles from './ClipComponent.module.css';
+import  axios  from 'axios';
 
-const ClipComponent = ({ clip, idx, swapClip, clips, selectedClipIndex, setSelectedClipIndex, previewClip }) => {
+const ClipComponent = ({ videoUrl,clip, idx, swapClip, clips, selectedClipIndex, setSelectedClipIndex, previewClip }) => {
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
@@ -53,6 +54,29 @@ const ClipComponent = ({ clip, idx, swapClip, clips, selectedClipIndex, setSelec
     //console.log(selectedClip);
   };
 
+  const handleDownloadClick = () => {
+    // Code to preview the selected clip goes here\
+    //const selectedClip = clips[idx];
+    //console.log("handleDownloadClick", {clip, idx});
+    //...clip
+    axios.post('/api/create', { videoUrl, clips: [{...clip}]}, {
+      headers: {
+        'Access-Control-Allow-Origin': 'http://localhost',
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE',
+        'Access-Control-Allow-Headers': '*',
+      },
+    })
+    .then(response => {
+      // Handle the response data
+      console.log(response.data);
+    })
+    .catch(error => {
+      // Handle any errors
+    });
+    
+    //console.log(selectedClip);
+  };
+
   const selectButtonCSS = isSelected ?  'select-buttonSelected': 'select-button';
 //[selectButtonCSS]
   return (
@@ -66,6 +90,7 @@ const ClipComponent = ({ clip, idx, swapClip, clips, selectedClipIndex, setSelec
         <div className={styles.clipButtons}>
           <button className={styles[selectButtonCSS]} onClick={handleSelectClick}>{isSelected ? 'Deselect' : 'Select'}</button>
           <button onClick={handlePreviewClick}>Preview</button>
+          <button onClick={handleDownloadClick}>Download</button>
           {isSelected ? <button onClick={handleSwapClick}>Swap</button> : null}
           {isSelected ? <button onClick={handleDeleteClick}>Delete</button> : null}
         </div>

@@ -25,12 +25,26 @@ export default function Home() {
   const [previewDuration, setPreviewDuration] = useState({});
   //const [videoTitle, setVideoTitle] = useState("");
   const [selectedClipIndex, setSelectedClipIndex] = useState(null);
+
+  const [startDuration, setStartDuration] = useState(0);
+  const [endDuration, setEndDuration] = useState(0);
   useEffect(() => {
   //  console.log("useEffect");
     if(pushed){
       
     }
   }, [pushed]); //, canPreview
+
+  const durationHandler = (_data) => {
+    if(_data.id==="start") { 
+
+      setStartDuration(_data.duration);
+    }
+    else if(_data.id==="end"){
+
+      setEndDuration(_data.duration);
+    }
+  }
 
   const finishedPush = (_push) => {
     setPushed(_push);
@@ -139,8 +153,8 @@ export default function Home() {
         {
           searchedURL ? 
           <div className="player-row">
-             <Player finishedPush={finishedPush} pushed={pushed} canShift={canShift} shift={shift} previewing={previewing} handlePreview={handlePreview} previewDuration={previewDuration} checkMark={endMark} markData={markData} id={"start"} videoUrl={videoUrl} />
-             <Player finishedPush={finishedPush} pushed={pushed} previewing={previewing} handlePreview={handlePreview} previewDuration={previewDuration} checkMark={startMark} markData={markData} id={"end"} videoUrl={videoUrl} />
+             <Player durationDifference={endDuration} durationHandler={durationHandler} finishedPush={finishedPush} pushed={pushed} canShift={canShift} shift={shift} previewing={previewing} handlePreview={handlePreview} previewDuration={previewDuration} checkMark={endMark} markData={markData} id={"start"} videoUrl={videoUrl} />
+             <Player durationDifference={startDuration} durationHandler={durationHandler} finishedPush={finishedPush} pushed={pushed} previewing={previewing} handlePreview={handlePreview} previewDuration={previewDuration} checkMark={startMark} markData={markData} id={"end"} videoUrl={videoUrl} />
           </div> : null
         }
       </div>
@@ -164,6 +178,7 @@ export default function Home() {
           idx={index} 
           clip={clip} 
           clips={clips} 
+          videoUrl={videoUrl}
           swapClip={swapClip}
           previewClip={previewClip}
           selectedClipIndex={selectedClipIndex}

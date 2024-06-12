@@ -17,6 +17,7 @@ nextApp.prepare().then(() => {
   server.post('/api/create', async (req, res) => {
     const { clips, videoUrl } = req.body; // Extract the URL from the request body
     console.log("API/CREATE");
+    console.log(clips);
    // console.log(req.body);
     //console.log(clips);
     let clip = createClip(videoUrl ,clips)
