@@ -1,0 +1,39 @@
+.clip{
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    margin: 1rem;
+    
+}
+
+.select-button {
+    
+}
+.select-buttonSelected {
+   color: white; 
+   background-color: green;
+}
+.clipInfo{
+    display: flex;
+    flex-direction: row;
+}
+
+.clipMarkers{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: min-content;
+    min-width: 150px;
+    margin-right: 5px;
+}
+
+.clipMarkers p{
+    margin: 0;
+}
+
+.clipButtons{
+    display: flex;
+    flex-direction: column;
+    width: min-content;
+}
+

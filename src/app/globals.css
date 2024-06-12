@@ -1,4 +1,41 @@
-:root {
+.player-row{
+  display: flex;
+  justify-content: center;
+}
+
+
+.mark-row{
+  display: flex;
+  flex-direction: row;
+}
+
+.duration-column{
+  display: flex;
+  flex-direction: column; 
+  width: 100%; 
+}
+
+#duration{
+  width: 100%;
+  
+}
+
+#mark{
+  width: 100%;
+}
+
+.player-column{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.urlForm{
+  text-align: center;
+}
+
+
+/*:root {
   --max-width: 1100px;
   --border-radius: 12px;
   --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
@@ -105,3 +142,4 @@ a {
     color-scheme: dark;
   }
 }
+*/

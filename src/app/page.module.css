@@ -1,4 +1,16 @@
-.main {
+.clipMenu{
+  display: flex;
+  flex-direction: column;
+  
+  align-items: center;
+  margin-top: 2rem;
+  overflow-y: scroll;
+  max-height: 400px;
+}
+
+
+
+/*.main {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -108,7 +120,7 @@
 .logo {
   position: relative;
 }
-/* Enable hover only on non-touch devices */
+/* Enable hover only on non-touch devices 
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
     background: rgba(var(--card-rgb), 0.1);
@@ -126,7 +138,7 @@
   }
 }
 
-/* Mobile */
+/* Mobile 
 @media (max-width: 700px) {
   .content {
     padding: 4rem;
@@ -203,7 +215,7 @@
   }
 }
 
-/* Tablet and Smaller Desktop */
+/* Tablet and Smaller Desktop 
 @media (min-width: 701px) and (max-width: 1120px) {
   .grid {
     grid-template-columns: repeat(2, 50%);
@@ -228,3 +240,4 @@
     transform: rotate(0deg);
   }
 }
+*/
