@@ -10,10 +10,10 @@ import { formatDuration } from "./utils/utils";
 import ClipComponent from "./components/Clip/ClipComponent";
 
 //import { getVideoDuration } from "./utils/utils";
-
+const gangstarr = 'https://www.youtube.com/watch?v=Jm0828I0GSc'
 
 export default function Home() {
-  const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=Jm0828I0GSc');
+  const [videoUrl, setVideoUrl] = useState(gangstarr);
   const [searchedURL, setSearchedURL] = useState(false);
   const [pushed, setPushed] = useState(false);
   const [startMark, setStartMark] = useState({});
@@ -28,12 +28,6 @@ export default function Home() {
 
   const [startDuration, setStartDuration] = useState(0);
   const [endDuration, setEndDuration] = useState(0);
-  useEffect(() => {
-  //  console.log("useEffect");
-    if(pushed){
-      
-    }
-  }, [pushed]); //, canPreview
 
   const durationHandler = (_data) => {
     if(_data.id==="start") { 
@@ -53,13 +47,15 @@ export default function Home() {
   useEffect(() => {
     //  console.log("useEffect");
       if(pushed) {
-        
+        //setClips([]);
         setPushed(false);
+        setSearchedURL(true);
       }
-    }, [pushed, startMark, endMark]);
+    }, [pushed]);
 
   const handleInputChange = (event) => {
     setVideoUrl(event.target.value);
+    
   };
 
   const handlePreview = (_data) => {
@@ -69,8 +65,9 @@ export default function Home() {
   const handleSubmit = (event) => {
    // console.log("handleSubmit");
     event.preventDefault();
-
-   setSearchedURL(true);
+    setSearchedURL(false);
+    setPushed(true);
+    setClips([]);
   };
 
   const markData = (_data) => {
@@ -94,13 +91,13 @@ export default function Home() {
   };
 
   const previewClip = (_clip) => {
-    console.log("previewClip", _clip);
+   // console.log("previewClip", _clip);
     //console.log(_clip.start);
     // Code to preview the selected clip goes here
    // console.log("previewClip", _clip);
     if (_clip !== previewDuration) {
       setPreviewDuration(_clip);
-      setPreviewing(true);
+      setPreviewing(true); 
     }
   };
 
@@ -123,7 +120,35 @@ export default function Home() {
     
   }
 
+  const insertSelectedClip = (e) => {
+    //console.log("insertSelectedClip", selectedClipIndex);
+    e.preventDefault();
+    if (selectedClipIndex !== null) {
+      let newClips = [...clips];
+      const newClip = {start: startMark.mark, end: endMark.mark};
+      let part1 = newClips.slice(0, selectedClipIndex);
+      let selectedClip = newClips[selectedClipIndex];
+      let part2 = newClips.slice(selectedClipIndex+1, newClips.length);
+      //part1.concat([newClip, selectedClip]).concat(part2);
+      if(e.target.id === "before") {
+       // newClips.unshift(newClip); // insert the new clip at the beginning of the array
+        newClips = [...part1, newClip, selectedClip, ...part2];
+      }
+      else if(e.target.id === "after") { 
+       // newClips.splice(selectedClipIndex + 1, 0, newClip);
+        newClips = [...part1, selectedClip, newClip, ...part2];
+      }
+    //  console.log(newClips);
+      setClips(newClips);
+      setSelectedClipIndex(null);
+      setStartMark({});
+      setEndMark({});
+    }
+  }
+
+
   const create = async () => {
+    
     axios.post('/api/create', { videoUrl,clips }, {
       headers: {
         'Access-Control-Allow-Origin': 'http://localhost',
@@ -138,6 +163,25 @@ export default function Home() {
     .catch(error => {
       // Handle any errors
     });
+
+}
+
+const downloadAll = async () => {
+    
+  axios.post('/api/downloadall', { videoUrl,clips }, {
+    headers: {
+      'Access-Control-Allow-Origin': 'http://localhost',
+      'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE',
+      'Access-Control-Allow-Headers': '*',
+    },
+  })
+  .then(response => {
+    // Handle the response data
+    console.log(response.data);
+  })
+  .catch(error => {
+    // Handle any errors
+  });
 
 }
 
@@ -159,17 +203,18 @@ export default function Home() {
         }
       </div>
       <div>
-        <button onClick={addClip}>Add Clip</button>
-
-
+        <button id='add' onClick={addClip}>Add Clip</button>
+       <button id='after' onClick={insertSelectedClip}>Insert After</button>
+       <button id='before' onClick={insertSelectedClip}>Insert Before</button>
         <button onClick={()=>{
           if(endMark.mark>0){
             setShift(true) 
-            console.log("Shift");
+           // console.log("Shift");
           }
           }}>Shift</button>
       </div>
       <button onClick={create}>Create</button>
+      <button onClick={downloadAll}>Download All</button>
       <div className={styles.clipMenu}>
       {(clips.length > 0) ? clips.map((clip, index) => {
         return (

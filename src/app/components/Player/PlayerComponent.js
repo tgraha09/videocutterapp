@@ -2,6 +2,7 @@
 
 import { formatDuration, getVideoIdFromUrl, fetchVideoTitle } from '@/app/utils/utils';
 import React, { useRef, useEffect, useState } from 'react';
+import { parse } from 'date-fns';
 import YouTubePlayer from 'youtube-player';
 
 const PlayerComponent = ({ durationDifference, durationHandler, finishedPush, pushed, shift, canShift,previewing, handlePreview, videoUrl, 
@@ -17,7 +18,7 @@ const PlayerComponent = ({ durationDifference, durationHandler, finishedPush, pu
   useEffect(() => {
     if (videoUrl) {
       const videoId = getVideoIdFromUrl(videoUrl);
-      console.log("initializePlayer", videoId);
+    //  console.log("initializePlayer", videoId);
       playerRef.current = YouTubePlayer(id, {
         videoId: videoId,
         playerVars: {
@@ -26,47 +27,26 @@ const PlayerComponent = ({ durationDifference, durationHandler, finishedPush, pu
       });
       if (playerRef.current && loaded === false) {
         playerRef.current.playVideo();
-        
-        
+
         playerRef.current.getDuration().then((duration) => {
         
           if(totalDuration==-1){
             setTotalDuration(duration);
-           // setLoaded(true);
-            
+            // setLoaded(true);
           }
         }); 
 
       }
       if(loaded===false && playerRef.current) {
   //      console.log("loaded");
-        
-    
       }
     }
   }, [videoUrl]);
 
 
-  useEffect(() => {
-    
-    if(loaded===true && totalDuration>-1) {
- //     console.log("TotalDuration: " + totalDuration);
-      
-    }
-    
-    if (loaded === true && playerRef.current) {
-      
-
-    }
-
-    
-  }, [loaded, playerRef.current]);
   const handleStateChange = (e) => {
     setState(e.data);
-    /**/
   };
-
-
 
   useEffect(() => {
     playerRef.current.on('stateChange', handleStateChange);
@@ -109,7 +89,7 @@ const PlayerComponent = ({ durationDifference, durationHandler, finishedPush, pu
 
   useEffect(() => {
     if(pushed) {
-      console.log("MARK", pushed);
+      //console.log("MARK", pushed);
       setMark(0);
       //finishedPush(false);
     }
@@ -117,7 +97,7 @@ const PlayerComponent = ({ durationDifference, durationHandler, finishedPush, pu
 
   useEffect(() => {
     if(pushed) {
-      console.log("finishedPush", pushed);
+     // console.log("finishedPush", pushed);
       setMark(0);
       finishedPush(false);
     }
@@ -189,7 +169,24 @@ const PlayerComponent = ({ durationDifference, durationHandler, finishedPush, pu
   <div className="mark-row">
 
   <div className="duration-column">
-    <h3 id='duration'>{`${id.toUpperCase()}: ${formatDuration(currentDuration)}`}</h3>
+
+  <input
+  type="text"
+  value={formatDuration(currentDuration)}
+  onChange={(e) => {
+    //console.log(e.target.value);
+    let formattedDuration = e.target.value
+    const [hours, minutes, seconds] = formattedDuration.split(':').map(parseFloat);
+
+    const originalNumber = hours * 3600 + minutes * 60 + seconds;
+
+    //console.log(originalNumber);
+    playerRef.current.seekTo(originalNumber, true);
+    playerRef.current.pauseVideo();
+    //setCurrentDuration(originalNumber);
+    //e.target.value = formatDuration(Number(e.target.value));
+  }}
+/>
     <h3 id='duration'>{`Total Duration: ${formatTotalDuration()}`}</h3>
     <h3 id='duration'>{`Mark: ${formatDuration(mark)}`}</h3>
     

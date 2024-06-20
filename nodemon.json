@@ -1,0 +1,6 @@
+{
+    "watch": ["server"],
+    "ext": "ts,js,json,html,css,scss,sass",
+    "ignore": ["node_modules"],
+    "exec": "nodemon --watch server --exec \"node --inspect --inspect-brk server/main.js\"" 
+}

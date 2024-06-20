@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import styles from './ClipComponent.module.css';
 import  axios  from 'axios';
 
-const ClipComponent = ({ videoUrl,clip, idx, swapClip, clips, selectedClipIndex, setSelectedClipIndex, previewClip }) => {
+const ClipComponent = ({ totalDuration, videoUrl,clip, idx, swapClip, clips, selectedClipIndex, setSelectedClipIndex, previewClip }) => {
   const [isSelected, setIsSelected] = useState(false);
-
+  const [editable, setEditable] = useState(false);
   useEffect(() => {
     //setIsSelected(selectedClipIndex === idx);
 
@@ -30,7 +30,7 @@ const ClipComponent = ({ videoUrl,clip, idx, swapClip, clips, selectedClipIndex,
       newClips[idx] = selectedClip;
       swapClip(newClips);
       setSelectedClipIndex(null);
-      //setIsSelected(false);
+      setIsSelected(false);
     }
   };
 
@@ -40,6 +40,19 @@ const ClipComponent = ({ videoUrl,clip, idx, swapClip, clips, selectedClipIndex,
       newClips.splice(selectedClipIndex, 1);
       swapClip(newClips);
       setSelectedClipIndex(null);
+      setIsSelected(false);
+      
+    }
+  };
+
+  const handleEditClick = () => {
+    if (selectedClipIndex !== null) {
+      const clip = clips[selectedClipIndex];
+      setEditable(!editable);
+      //newClips.splice(selectedClipIndex, 1);
+      //swapClip(newClips);
+      //setSelectedClipIndex(null);
+      //setIsSelected(false);
       
     }
   };
@@ -47,7 +60,7 @@ const ClipComponent = ({ videoUrl,clip, idx, swapClip, clips, selectedClipIndex,
   const handlePreviewClick = () => {
     // Code to preview the selected clip goes here\
     //const selectedClip = clips[idx];
-    console.log("handlePreviewClick", {clip, idx});
+   // console.log("handlePreviewClick", {clip, idx});
     
     previewClip({...clip, idx});
     
@@ -68,7 +81,7 @@ const ClipComponent = ({ videoUrl,clip, idx, swapClip, clips, selectedClipIndex,
     })
     .then(response => {
       // Handle the response data
-      console.log(response.data);
+      //console.log(response.data);
     })
     .catch(error => {
       // Handle any errors
@@ -84,15 +97,55 @@ const ClipComponent = ({ videoUrl,clip, idx, swapClip, clips, selectedClipIndex,
       <h4>Clip {idx + 1}</h4>
       <div className={styles.clipInfo}>
         <div className={styles.clipMarkers}>
-          <p>Start: {formatDuration(clip.start)}</p>
-          <p>End: {formatDuration(clip.end)}</p>
+          {isSelected ? 
+          <>
+          {editable && isSelected ? (
+          <div>
+            <input
+              type="text"
+              placeholder="Start"
+              value={clip.start}
+              onChange={(e) => {
+                const newClips = [...clips];
+                newClips[idx].start = e.target.value;
+                swapClip(newClips);
+              }}
+            />
+            <input
+              type="text"
+              placeholder="End"
+              value={clip.end}
+              onChange={(e) => {
+                const newClips = [...clips];
+                newClips[idx].end = e.target.value;
+                swapClip(newClips);
+              }} />
+          </div>
+        ) : (   
+          <>
+            <p>Start: {formatDuration(clip.start)}</p>
+            <p>End: {formatDuration(clip.end)}</p>
+            <p>Total: {formatDuration(clip.end - clip.start)}</p>
+          </>
+        )}
+          </> :<>
+            <p>Start: {formatDuration(clip.start)}</p>
+            <p>End: {formatDuration(clip.end)}</p>
+            <p>Total: {formatDuration(clip.end - clip.start)}</p>
+            </>}
+          
         </div>
         <div className={styles.clipButtons}>
-          <button className={styles[selectButtonCSS]} onClick={handleSelectClick}>{isSelected ? 'Deselect' : 'Select'}</button>
-          <button onClick={handlePreviewClick}>Preview</button>
-          <button onClick={handleDownloadClick}>Download</button>
-          {isSelected ? <button onClick={handleSwapClick}>Swap</button> : null}
-          {isSelected ? <button onClick={handleDeleteClick}>Delete</button> : null}
+          <div className={styles.panel1}>
+            <button className={styles[selectButtonCSS]} onClick={handleSelectClick}>{isSelected ? 'Deselect' : 'Select'}</button>
+            <button onClick={handlePreviewClick}>Preview</button>
+            <button onClick={handleDownloadClick}>Download</button>
+          </div>
+          <div className={styles.panel2}>
+            {isSelected ? <button onClick={handleSwapClick}>Swap</button> : null}
+            {isSelected ? <button onClick={handleEditClick}>Edit</button> : null}
+            {isSelected ? <button onClick={handleDeleteClick}>Delete</button> : null}
+          </div>
         </div>
       </div>
     </div>

@@ -6,13 +6,7 @@
     
 }
 
-.select-button {
-    
-}
-.select-buttonSelected {
-   color: white; 
-   background-color: green;
-}
+
 .clipInfo{
     display: flex;
     flex-direction: row;
@@ -27,13 +21,48 @@
     margin-right: 5px;
 }
 
-.clipMarkers p{
+.clipMarkers input{
+    
+}
+
+.clipMarkers p, .clipMarkers input{
     margin: 0;
 }
 
-.clipButtons{
-    display: flex;
-    flex-direction: column;
-    width: min-content;
+.clipButtons button{
+    width: 100px;
 }
 
+.clipButtons{
+   /* display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 200px;*/
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto
+}
+
+.panel1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.panel2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.select-button {
+    
+}
+.select-buttonSelected {
+   color: white; 
+   background-color: green;
+}
