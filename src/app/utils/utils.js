@@ -33,6 +33,12 @@ export const formatDuration = (seconds) => {
   return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 }
 
+export const reformatDuration = (durationString) => {
+  const [hours, minutes, seconds] = durationString.split(':').map(Number);
+  const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+  return totalSeconds;
+};
+
 export const handler = (callback)=>{
   callback();
 }

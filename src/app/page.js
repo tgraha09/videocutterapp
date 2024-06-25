@@ -185,6 +185,15 @@ const downloadAll = async () => {
 
 }
 
+const calculateTotalDuration = (clips) => {
+  let totalDuration = 0;
+  for (let i = 0; i < clips.length; i++) {
+    totalDuration += clips[i].end - clips[i].start;
+  }
+  //console.log(totalDuration);
+  return totalDuration;
+}
+
   return (
     <div className="container">
       <h1 className="display-4">Hello, Bootstrap!</h1>
@@ -203,6 +212,7 @@ const downloadAll = async () => {
         }
       </div>
       <div>
+        
         <button id='add' onClick={addClip}>Add Clip</button>
        <button id='after' onClick={insertSelectedClip}>Insert After</button>
        <button id='before' onClick={insertSelectedClip}>Insert Before</button>
@@ -215,7 +225,14 @@ const downloadAll = async () => {
       </div>
       <button onClick={create}>Create</button>
       <button onClick={downloadAll}>Download All</button>
+      <button onClick={()=>{setClips([])}}> Clear All</button>
+      <div>
+        <h3>Total Clips: {clips.length}</h3>
+        
+        <h3>Duration of all Clips: {formatDuration(calculateTotalDuration(clips))}</h3>
+      </div>
       <div className={styles.clipMenu}>
+        
       {(clips.length > 0) ? clips.map((clip, index) => {
         return (
           <ClipComponent

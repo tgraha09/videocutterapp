@@ -1,4 +1,4 @@
-import { formatDuration } from '@/app/utils/utils';
+import { formatDuration, reformatDuration } from '@/app/utils/utils';
 import React, { useState, useEffect } from 'react';
 import styles from './ClipComponent.module.css';
 import  axios  from 'axios';
@@ -104,21 +104,42 @@ const ClipComponent = ({ totalDuration, videoUrl,clip, idx, swapClip, clips, sel
             <input
               type="text"
               placeholder="Start"
-              value={clip.start}
+              value={formatDuration(clip.start)}
               onChange={(e) => {
-                const newClips = [...clips];
-                newClips[idx].start = e.target.value;
+                let newClips = [...clips];
+               // console.log(e.target.value);
+              //  console.log(reformatDuration(e.target.value));
+                newClips[idx].start = parseFloat(reformatDuration(e.target.value));
+                //swapClip(newClips);
+                //let oldClip = newClips[selectedClipIndex];
+                //let newClip = newClips[idx];
+               // console.log(clip.start);
+                //clip.start = parseFloat(e.target.value);
+               // console.log(newClips[idx].start);
                 swapClip(newClips);
+               // clips[selectedClipIndex] = clip;
+
+               // swapClip(clips);
+
               }}
             />
             <input
               type="text"
               placeholder="End"
-              value={clip.end}
+              value={formatDuration(clip.end)}
               onChange={(e) => {
-                const newClips = [...clips];
-                newClips[idx].end = e.target.value;
+                let newClips = [...clips];
+                //console.log(e.target.value);
+                //console.log(reformatDuration(e.target.value));
+                newClips[idx].end = parseFloat(reformatDuration(e.target.value));
+                //swapClip(newClips);
+                //let oldClip = newClips[selectedClipIndex];
+                //let newClip = newClips[idx];
+                //console.log(clip.end);
+                //clip.start = parseFloat(e.target.value);
+                //console.log(newClips[idx].end);
                 swapClip(newClips);
+              //  swapClip(clips);
               }} />
           </div>
         ) : (   

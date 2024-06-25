@@ -183,7 +183,7 @@ const PlayerComponent = ({ durationDifference, durationHandler, finishedPush, pu
     //console.log(originalNumber);
     playerRef.current.seekTo(originalNumber, true);
     playerRef.current.pauseVideo();
-    //setCurrentDuration(originalNumber);
+    setCurrentDuration(originalNumber);
     //e.target.value = formatDuration(Number(e.target.value));
   }}
 />
