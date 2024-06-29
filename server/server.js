@@ -9,33 +9,57 @@ const express = require('express');
 const { createClip } = require('./utilities/utilities');
 require('dotenv').config();
 const port = process.env.PORT || 3000;
-nextApp.prepare().then(() => {
-  const server = express();
+const server = express();
   server.use(express.json());
 
-
-  server.post('/api/create', async (req, res) => {
-    const { clips, videoUrl } = req.body; // Extract the URL from the request body
-    console.log("API/CREATE");
-    //console.log(req.body);
-
-    //console.log(clips);
-    //let clip = createClip(videoUrl, clips)
-    
-    res.status(201).send('Resource created');
-    // Proxy the request to Next.js app
-    return handle(req, res);
+const runSever = async () => {
+  nextApp.prepare().then(() => {
+    const server = express();
+    server.use(express.json());
+  
+    server.post('/api/downloadall', async (req, res) => {
+      const { clips, videoUrl } = req.body; // Extract the URL from the request body
+    console.log("API/DOWNLOADALL POST");
+      // console.log(req.body);
+      await createClip(videoUrl, clips, true);
+      
+      //let clip = createClip(videoUrl ,clips)
+      
+      res.status(201).send('Resource created');
+      // Proxy the request to Next.js app
+      return handle(req, res);
+    });
+  
+    server.post('/api/create', async (req, res) => {
+      const { clips, videoUrl } = req.body; // Extract the URL from the request body
+      console.log("API/CREATE POST");
+      // console.log(req.body);
+      await createClip(videoUrl, clips, false);
+      
+      //let clip = createClip(videoUrl ,clips)
+      
+      res.status(201).send('Resource created');
+      // Proxy the request to Next.js app
+      return handle(req, res);
+    });
+  
+    server.get('*', (req, res) => {
+      return handle(req, res);
+    });
+  
+    server.listen(port, (err) => {
+      if (err) throw err;
+      console.log(`> Ready on http://localhost:${port}`);
+  
+      // Start the server
+      
+    });
   });
+};
 
-  server.get('*', (req, res) => {
-    return handle(req, res);
-  });
-
-  server.listen(port, (err) => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
-  });
-});
+  module.exports = {
+    runSever
+  }
 
 /*// Enable CORS for all routes
   server.use((req, res, next) => {

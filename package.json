@@ -5,8 +5,25 @@
   "description": "My Electron app",
   "author": "Atlas",
   "main": "server/main.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:electron": "electron-builder",
+    "lint": "next lint",
+    "test": "electron ./server/main.js",
+    "start:electron": "npm run electron ./server/main.js",
+    "start": "electron .",
+    "watch": "nodemon --exec electron .",
+    "tauri": "tauri"
+  },
   "build": {
     "productName": "VideocutterApp",
+    "build": {
+    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run dev",
+    "devPath": "http://localhost:3000",
+    "distDir": "../out"
+  },
     "files": [
       "dist/**/*",
       "server/**/*",
@@ -18,17 +35,6 @@
       "server/main.js",
       "node_modules/**/*"
     ]
-  },
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "build:electron": "electron-builder",
-    "lint": "next lint",
-    "test": "electron ./server/main.js",
-    "start:electron": "npm run electron ./server/main.js",
-    "start": "electron .",
-    "watch": "nodemon --exec electron .",
-    "tauri": "tauri dev"
   },
   "dependencies": {
     "axios": "^1.7.2",
